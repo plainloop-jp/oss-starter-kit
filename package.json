@@ -1,0 +1,40 @@
+{
+  "name": "oss-starter-kit",
+  "version": "0.1.0",
+  "description": "A small CLI that creates starter files for open-source projects.",
+  "type": "module",
+  "bin": {
+    "oss-starter-kit": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node ./src/cli.js init --dry-run .",
+    "prepublishOnly": "npm test && npm run check"
+  },
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plainloop-jp/oss-starter-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/plainloop-jp/oss-starter-kit/issues"
+  },
+  "homepage": "https://github.com/plainloop-jp/oss-starter-kit#readme",
+  "keywords": [
+    "open-source",
+    "oss",
+    "cli",
+    "starter-kit",
+    "templates"
+  ],
+  "author": "plainloop-jp",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
