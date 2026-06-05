@@ -8,6 +8,40 @@ It pairs well with
 [OSS Readiness Checker](https://github.com/plainloop-jp/oss-readiness-checker):
 check what is missing, then generate a practical starter set.
 
+## Quick start
+
+Run this command in the root folder of your project:
+
+```sh
+npx oss-starter-kit init .
+```
+
+Windows PowerShell:
+
+```powershell
+npx.cmd oss-starter-kit init .
+```
+
+## Example output
+
+When starter files are created, the output looks like this:
+
+```text
+OSS Starter Kit
+Project: /path/to/your-project
+
+[CREATED] CONTRIBUTING.md
+[CREATED] SECURITY.md
+[CREATED] CODE_OF_CONDUCT.md
+[CREATED] .github/pull_request_template.md
+[CREATED] .github/ISSUE_TEMPLATE/bug-report.yml
+[CREATED] .github/ISSUE_TEMPLATE/feature-request.yml
+[CREATED] .github/ISSUE_TEMPLATE/config.yml
+```
+
+Existing files are never overwritten. If a file already exists, it is shown as
+`[SKIPPED]`.
+
 ## 日本語で試す
 
 OSS として公開するときによく必要になるファイルをまとめて作るCLIツールです。
