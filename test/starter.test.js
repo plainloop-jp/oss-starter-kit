@@ -45,6 +45,33 @@ test("dry run reports files without writing them", async (context) => {
   await assert.rejects(() => readFile(join(projectPath, "CONTRIBUTING.md"), "utf8"));
 });
 
+test("creates only selected starter files", async (context) => {
+  const projectPath = await mkdtemp(join(tmpdir(), "oss-starter-kit-"));
+  context.after(() => rm(projectPath, { recursive: true, force: true }));
+
+  const report = await createStarterKit(projectPath, {
+    only: "security,contributing"
+  });
+
+  assert.deepEqual(
+    report.results.map((result) => result.path),
+    ["SECURITY.md", "CONTRIBUTING.md"]
+  );
+  assert.match(await readFile(join(projectPath, "SECURITY.md"), "utf8"), /Security Policy/);
+  assert.match(await readFile(join(projectPath, "CONTRIBUTING.md"), "utf8"), /Contributing/);
+  await assert.rejects(() => readFile(join(projectPath, "CODE_OF_CONDUCT.md"), "utf8"));
+});
+
+test("rejects unknown starter file names", async (context) => {
+  const projectPath = await mkdtemp(join(tmpdir(), "oss-starter-kit-"));
+  context.after(() => rm(projectPath, { recursive: true, force: true }));
+
+  await assert.rejects(
+    () => createStarterKit(projectPath, { only: "security,unknown-file" }),
+    /Unknown starter file name: unknown-file/
+  );
+});
+
 test("creates nested directories when needed", async (context) => {
   const projectPath = await mkdtemp(join(tmpdir(), "oss-starter-kit-"));
   context.after(() => rm(projectPath, { recursive: true, force: true }));

@@ -3,6 +3,8 @@ import { dirname, resolve } from "node:path";
 
 const FILES = [
   {
+    id: "contributing",
+    aliases: ["contributing.md"],
     path: "CONTRIBUTING.md",
     content: `# Contributing
 
@@ -26,6 +28,8 @@ Open a GitHub issue with:
 `
   },
   {
+    id: "security",
+    aliases: ["security.md"],
     path: "SECURITY.md",
     content: `# Security Policy
 
@@ -43,6 +47,8 @@ publicly.
 `
   },
   {
+    id: "code-of-conduct",
+    aliases: ["code-of-conduct.md", "conduct"],
     path: "CODE_OF_CONDUCT.md",
     content: `# Code of Conduct
 
@@ -71,6 +77,8 @@ TODO: add a private contact email
 `
   },
   {
+    id: "pull-request-template",
+    aliases: ["pr-template", "pull-request", "pull-request-template.md"],
     path: ".github/pull_request_template.md",
     content: `## Summary
 
@@ -92,6 +100,8 @@ Link an issue when applicable, for example: \`Closes #123\`
 `
   },
   {
+    id: "bug-report",
+    aliases: ["bug", "bug-report.yml"],
     path: ".github/ISSUE_TEMPLATE/bug-report.yml",
     content: `name: Bug report
 description: Report something that is not working as expected.
@@ -130,6 +140,8 @@ body:
 `
   },
   {
+    id: "feature-request",
+    aliases: ["feature", "feature-request.yml"],
     path: ".github/ISSUE_TEMPLATE/feature-request.yml",
     content: `name: Feature request
 description: Suggest an improvement or new feature.
@@ -156,11 +168,60 @@ body:
 `
   },
   {
+    id: "issue-config",
+    aliases: ["config", "issue-template-config", "config.yml"],
     path: ".github/ISSUE_TEMPLATE/config.yml",
     content: `blank_issues_enabled: true
 `
   }
 ];
+
+function normalizeOnlyList(only) {
+  if (only === undefined || only === null) {
+    return null;
+  }
+
+  const values = Array.isArray(only) ? only : String(only).split(",");
+  const requested = values.map((value) => value.trim().toLowerCase()).filter(Boolean);
+
+  if (requested.length === 0) {
+    throw new Error("The --only option needs at least one starter file name.");
+  }
+
+  const fileByName = new Map();
+
+  for (const file of FILES) {
+    fileByName.set(file.id, file);
+    for (const alias of file.aliases) {
+      fileByName.set(alias, file);
+    }
+  }
+
+  const selected = [];
+  const unknown = [];
+
+  for (const name of requested) {
+    const file = fileByName.get(name);
+
+    if (!file) {
+      unknown.push(name);
+      continue;
+    }
+
+    if (!selected.includes(file)) {
+      selected.push(file);
+    }
+  }
+
+  if (unknown.length > 0) {
+    const available = FILES.map((file) => file.id).join(", ");
+    throw new Error(
+      `Unknown starter file name: ${unknown.join(", ")}. Available names: ${available}.`
+    );
+  }
+
+  return selected;
+}
 
 export function getStarterFiles() {
   return FILES.map((file) => ({ ...file }));
@@ -169,9 +230,10 @@ export function getStarterFiles() {
 export async function createStarterKit(path = ".", options = {}) {
   const root = resolve(path);
   const dryRun = Boolean(options.dryRun);
+  const files = normalizeOnlyList(options.only) ?? FILES;
   const results = [];
 
-  for (const file of FILES) {
+  for (const file of files) {
     const filePath = resolve(root, file.path);
 
     if (dryRun) {

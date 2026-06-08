@@ -12,13 +12,14 @@ function printHelp() {
   console.log(`OSS Starter Kit
 
 Usage:
-  oss-starter-kit init [path] [--dry-run] [--json]
+  oss-starter-kit init [path] [--dry-run] [--json] [--only <names>]
   oss-starter-kit --help
   oss-starter-kit --version
 
 Examples:
   oss-starter-kit init .
-  oss-starter-kit init ../my-project --dry-run`);
+  oss-starter-kit init ../my-project --dry-run
+  oss-starter-kit init . --only security,contributing`);
 }
 
 function parseArguments(args) {
@@ -30,15 +31,59 @@ function parseArguments(args) {
     return { command: "version" };
   }
 
-  const dryRun = args.includes("--dry-run");
-  const json = args.includes("--json");
-  const positional = args.filter((argument) => !["--dry-run", "--json"].includes(argument));
+  let dryRun = false;
+  let json = false;
+  let only;
+  const positional = [];
+
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index];
+
+    if (argument === "--dry-run") {
+      dryRun = true;
+      continue;
+    }
+
+    if (argument === "--json") {
+      json = true;
+      continue;
+    }
+
+    if (argument === "--only") {
+      const value = args[index + 1];
+
+      if (!value || value.startsWith("--")) {
+        return { command: "invalid", message: "The --only option needs a comma-separated list." };
+      }
+
+      only = value;
+      index += 1;
+      continue;
+    }
+
+    if (argument.startsWith("--only=")) {
+      const value = argument.slice("--only=".length);
+
+      if (!value) {
+        return { command: "invalid", message: "The --only option needs a comma-separated list." };
+      }
+
+      only = value;
+      continue;
+    }
+
+    if (argument.startsWith("--")) {
+      return { command: "invalid", message: `Unknown option: ${argument}` };
+    }
+
+    positional.push(argument);
+  }
 
   if (positional[0] !== "init" || positional.length > 2) {
     return { command: "invalid" };
   }
 
-  return { command: "init", path: positional[1] ?? ".", dryRun, json };
+  return { command: "init", path: positional[1] ?? ".", dryRun, json, only };
 }
 
 function printReport(report) {
@@ -69,7 +114,7 @@ async function main() {
   }
 
   if (options.command === "invalid") {
-    console.error("Invalid arguments.");
+    console.error(options.message ?? "Invalid arguments.");
     printHelp();
     process.exitCode = 2;
     return;
@@ -77,7 +122,8 @@ async function main() {
 
   try {
     const report = await createStarterKit(options.path, {
-      dryRun: options.dryRun
+      dryRun: options.dryRun,
+      only: options.only
     });
 
     if (options.json) {

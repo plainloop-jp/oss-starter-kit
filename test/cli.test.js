@@ -45,3 +45,22 @@ test("CLI dry run supports JSON output", async (context) => {
   assert.equal(report.dryRun, true);
   assert.equal(report.results[0].status, "would-create");
 });
+
+test("CLI init supports --only", async (context) => {
+  const projectPath = await mkdtemp(join(tmpdir(), "oss-starter-kit-cli-"));
+  context.after(() => rm(projectPath, { recursive: true, force: true }));
+
+  const { stdout } = await execFileAsync(process.execPath, [
+    cliPath,
+    "init",
+    projectPath,
+    "--only",
+    "security,contributing"
+  ]);
+
+  assert.match(stdout, /\[CREATED\] SECURITY\.md/);
+  assert.match(stdout, /\[CREATED\] CONTRIBUTING\.md/);
+  assert.doesNotMatch(stdout, /CODE_OF_CONDUCT\.md/);
+  assert.match(await readFile(join(projectPath, "SECURITY.md"), "utf8"), /Security Policy/);
+  await assert.rejects(() => readFile(join(projectPath, "CODE_OF_CONDUCT.md"), "utf8"));
+});

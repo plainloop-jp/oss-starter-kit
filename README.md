@@ -93,6 +93,22 @@ Output machine-readable JSON:
 npx oss-starter-kit init . --dry-run --json
 ```
 
+Create only selected starter files:
+
+```sh
+npx oss-starter-kit init . --only security,contributing
+```
+
+Available names for `--only`:
+
+- `contributing`
+- `security`
+- `code-of-conduct`
+- `pull-request-template`
+- `bug-report`
+- `feature-request`
+- `issue-config`
+
 Existing files are never overwritten.
 
 ## Development
