@@ -22,6 +22,12 @@ Windows PowerShell:
 npx.cmd oss-starter-kit init .
 ```
 
+Create only selected files:
+
+```sh
+npx oss-starter-kit init . --only security,contributing
+```
+
 ## Example output
 
 When starter files are created, the output looks like this:
@@ -44,19 +50,25 @@ Existing files are never overwritten. If a file already exists, it is shown as
 
 ## 日本語で試す
 
-OSS として公開するときによく必要になるファイルをまとめて作るCLIツールです。
-既にあるファイルは上書きせず、スキップします。
+OSS として公開するときによく必要になるファイルをまとめて作る
+CLI ツールです。既にあるファイルは上書きせず、スキップします。
 
-Windows の PowerShell:
+Windows PowerShell:
 
 ```powershell
 npx.cmd oss-starter-kit init .
 ```
 
-macOS または Linux:
+macOS or Linux:
 
 ```sh
 npx oss-starter-kit init .
+```
+
+特定のファイルだけ作りたい場合:
+
+```sh
+npx oss-starter-kit init . --only security,contributing
 ```
 
 ## What it creates
